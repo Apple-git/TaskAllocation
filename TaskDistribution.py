@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify, render_template
 import os
 
 app = Flask(__name__)
+port = int(os.environ.get("PORT", 5000))  # Default to 5000 for local
+app.run(host="0.0.0.0", port=port)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
