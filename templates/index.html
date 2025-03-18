@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Distribution</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Task Distribution</h1>
+    <form id="distributionForm" enctype="multipart/form-data">
+        <label for="tasks_file">Tasks File (one task per line):</label>
+        <input type="file" id="tasks_file" name="tasks_file"><br>
+        <label for="workers">Workers (comma separated):</label>
+        <input type="text" id="workers" name="workers"><br>
+        <button type="submit">Distribute</button>
+    </form>
+    <h2>Distribution Result</h2>
+    <table id="resultTable">
+        <thead>
+            <tr>
+                <th>Worker</th>
+                <th>Tasks</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        document.getElementById('distributionForm').onsubmit = function(event) {
+            event.preventDefault();
+            const formData = new FormData(document.getElementById('distributionForm'));
+
+            fetch('/distribute', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultTableBody = document.getElementById('resultTable').getElementsByTagName('tbody')[0];
+                resultTableBody.innerHTML = ''; // Clear previous results
+
+                for (const [worker, tasks] of Object.entries(data)) {
+                    const row = resultTableBody.insertRow();
+                    const workerCell = row.insertCell(0);
+                    const tasksCell = row.insertCell(1);
+                    workerCell.textContent = worker;
+                    tasksCell.innerText = tasks.join("\n");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
